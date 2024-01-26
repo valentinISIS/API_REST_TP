@@ -91,6 +91,30 @@
                 })
                 .catch(afficheMessage);
         }
+
+        function supprimeCategorie(code){
+            fetch("api/categories/"+code,
+                {
+                    method: 'delete',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => {
+                    // On vérifie le code de retour de la requête
+                    switch (response.status) {
+                        case 200: // Created: ça s'est bien passé
+                            // On recharge la liste des catégories
+                            chargeCategories();
+                            break;
+                        case 409: // Conflict: doublon dans les noms
+                            afficheMessage("Cette catégorie ne peut pas être supprimée");
+                            break;
+                    }
+                })
+                .catch(afficheMessage);
+        }
     </script>
 </head>
 
@@ -116,11 +140,11 @@
         <h2>Liste des catégories ({{_embedded.categories.length}} / {{page.totalElements}})</h2>
         <TABLE>
         {{! Un commentaire Mustache }}
-        <TR><TH>Code</TH><TH>Libelle</TH><TH>Description</TH></TR>
+        <TR><TH>Code</TH><TH>Libelle</TH><TH>Description</TH><TH>Action</TH></TR>
         {{! Pour chaque categorie dans le tableau 'categories' }}
         {{#_embedded.categories}}
         {{! Une ligne dans la table }}
-        <TR><TD>{{code}}</TD><TD>{{libelle}}</TD><TD>{{description}}</TD></TR>
+        <TR><TD>{{code}}</TD><TD>{{libelle}}</TD><TD>{{description}}</TD><TD><BUTTON TYPE="button" ONCLICK="supprimeCategorie({{code}})">Supprimer</BUTTON></TD></TR>
         {{/_embedded.categories}}
         </TABLE>
     </script>
